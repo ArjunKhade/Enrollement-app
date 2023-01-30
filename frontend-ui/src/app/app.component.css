@@ -1,0 +1,23 @@
+.box{
+  text-align: center;
+}
+
+h2{
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  text-align: center;
+  margin-top: 1em;
+  font-weight: 200;
+}
+
+.form-box{
+  border: 0.2em;
+  width: 100%;
+  border-color: black;
+  background-color: #eee;
+  margin-top: 3rem;
+  padding-left: 2em;
+  padding-right: 2em;
+  
+  
+}
+

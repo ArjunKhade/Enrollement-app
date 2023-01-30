@@ -1,0 +1,98 @@
+<div class="container-fluid row form-box">
+ <div class="col-6">
+  <h2>Enrollment Form</h2>
+  <div class=" ">
+     <form #userForm="ngForm" (ngSubmit)="submitForm()">
+     <!-- {{userForm.value | json}} -->
+      <br>
+     <!--{{userModel | json}} --> 
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text"  class="form-control" name="Name" [(ngModel)]= "user.name">
+      </div>
+
+      <div class="form-group ">
+        <label>Email</label>
+        <input type="email" class="form-control" name="Email" [(ngModel)]= "user.email" >
+      </div>
+
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" class="form-control" name="Phone" [(ngModel)]= "user.phone" >
+      </div>
+
+      <div class="form-group my-2">
+        <select class="custom-select" name="Topic" [(ngModel)]= "user.topic">
+          <option value="">I am Interested In</option>
+          <option *ngFor="let topic of topics">{{topic}}</option>
+          
+        </select>
+      </div>
+   
+     <div class="mb-3">
+      <label>Time Preferences</label>
+      <div class="form-check ">
+        <input class="form-check-input" type="radio" name="TimePreference" value="morning" [(ngModel)]= "user.timePreference">
+        <label>Morning (9AM-12PM)</label>
+    </div>
+
+    <div class="form-check ">
+      <input class="form-check-input " type="radio" name="TimePreference" value="evening" [(ngModel)]= "user.timePreference">
+      <label>Evening (5PM-8PM)</label>
+    </div>
+     </div>
+
+     <div class="form-check-mb3">
+      <input class="form-check-input" type="checkbox" name="Subscription" [(ngModel)]= "user.subscription">
+      <label class="form-check-label">Send Me Promotional Offers!</label>
+     </div>
+
+     <div class="row my-2">
+      <div class="col-2">
+        <button class="btn btn-success" type="submit">Submit</button>
+      </div>
+      <!-- <div class="col-2">
+        <button class="btn btn-danger" type="submit" (click)="resetForm()">Reset</button>
+      </div> -->
+
+     </div>
+
+     </form>
+
+  </div>
+ </div>
+
+<div class="col-6 list-box">
+   <h2>User List</h2>
+
+   <table class="table">
+    <thead >
+      <tr><th>Name</th>
+        <th >Email</th>
+        <th>Phone</th>
+        <th>Subcription</th>
+        <th>Time </th>
+      <th>Actions</th>
+      </tr>
+    </thead>
+    
+
+     <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{user.name}}</td>
+        <td>{{user.email}}</td>
+        <td>{{user.phone}}</td>
+        <td>{{user.topic}}</td>
+        <td>{{user.timePreference}}</td>
+        <td><button class="btn btn-primary" (click)="populateForm(user)" >Update</button></td>
+        <td><button class="btn btn-danger" (click)="deleteUser(user)">Delete</button></td>
+      </tr>
+     </tbody>
+
+    
+   </table>
+
+
+</div>
+
+</div>
