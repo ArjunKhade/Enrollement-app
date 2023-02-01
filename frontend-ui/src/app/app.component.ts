@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import {FormGroup, FormControl} from '@angular/forms'
 import { User } from './model/User';
-import{EnrollmentService} from './enrollment.service'
+import{EnrollmentService} from './enrollment.service';
+import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -23,11 +26,19 @@ export class AppComponent implements OnInit {
 
   
 // submmited:boolean=false;
-  constructor(private _enrollmentService:EnrollmentService){
+  constructor(private _enrollmentService:EnrollmentService, private router:Router){
 
   }
   ngOnInit(): void {
     this.getAllUsers();
+  }
+
+  alertForSave(){
+    Swal.fire('Saved!','Data Saved succesfully!', 'success' );
+  }
+
+  navigateToDefault(){
+    this.router.navigateByUrl("");
   }
 
 submitForm(){
@@ -35,6 +46,8 @@ submitForm(){
    if(this.user.id===''){
     this._enrollmentService.addUser(this.user).subscribe(res => {
       console.log(res);
+      this.alertForSave();
+      this.navigateToDefault();
       this.getAllUsers();
       this.user = {
         id:'',
@@ -63,6 +76,8 @@ submitForm(){
 updateUser(user:User){
   this._enrollmentService.updateUser(user).subscribe(res => {
     console.log(res);
+    Swal.fire('Updated!','Updated succesfully!', 'success');
+    this.navigateToDefault();
     this.getAllUsers();
   })
 }
@@ -97,5 +112,30 @@ resetForm(){
   }
 }
 
+confirmBox(user:User){
+  Swal.fire({
+    title: 'Are you sure want to remove?',
+    text: 'You will not be able to recover this file!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'No, keep it'
+  }).then((result) => {
+    if (result.value) {
+      this.deleteUser(user);
+      Swal.fire(
+        'Deleted!',
+        'Your file has been deleted.',
+        'success'
+      )
+    } else if (result.dismiss === Swal.DismissReason.cancel) {
+      Swal.fire(
+        'Cancelled',
+        'Your file is safe :)',
+        'error'
+      )
+    }
+  })
+}
  
 }

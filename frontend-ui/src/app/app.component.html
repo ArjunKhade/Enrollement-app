@@ -19,7 +19,7 @@
         <small class="text-danger" [class.d-none]="email.valid || email.untouched">* Please Enter valid Email & Email is required </small>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" >
         <label>Phone</label>
         <input type="tel" #phone="ngModel" pattern="^\d{10}$" [class.is-invalid]= "phone.invalid && phone.touched" required class="form-control" name="Phone" [(ngModel)]= "user.phone" >
         <small class="text-danger" [class.d-none]="phone.valid || phone.untouched" >*Phone number is required & must be 10 digit </small>
@@ -93,20 +93,20 @@
         <td>{{user.topic}}</td>
         <td>{{user.timePreference}}</td>
         <td><button class="btn btn-primary" (click)="populateForm(user)" >Update</button></td>
-        <td><button class="btn btn-danger" (click)="deleteUser(user)">Delete</button></td>
+        <td><button class="btn btn-danger" (click)="confirmBox(user) ">Delete</button></td>
       </tr>
      </tbody>
 
     
    </table>
-   <div>
+   <!-- <div>
     <mat-paginator showFirstLastButtons [length]="100"
               [pageSize]="10"
               [pageSizeOptions]="[5, 10, 25, 100]"
               aria-label="Select page" >
 </mat-paginator>
 
-   </div>
+   </div> -->
 
 
 </div>
