@@ -1,0 +1,432 @@
+#add dependency 
+core,tools,sqlserver
+*******************************************************************************
+# open nuget package manager console
+add-migration
+Name: Initial
+update-database
+*******************************************************************************
+#create DbContext Class
+public class UsersDbContext : DbContext
+    {
+     public UsersDbContext(DbContextOptions options):base(options){}
+
+        //Dbset
+        public DbSet<User> Users { get; set; }
+
+    }
+*******************************************************************************
+
+#add this in appsetting.json
+
+"ConnectionStrings": {
+    "UserDbConnectionString": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Users;Integrated Security=True;"
+  }
+********************************************************************************
+#Db setup add in programm.cs
+//inject dbcontext
+
+builder.Services.AddDbContext<UsersDbContext>(options => options.UseSqlServer(
+    builder.Configuration.GetConnectionString("UserDbConnectionString")));
+********************************************************************************
+#add cors config in programm.cs
+
+builder.Services.AddCors(setup =>
+{
+    setup.AddPolicy("default", options =>
+    {
+        options.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin();
+    });
+});
+
+ app.UseCors("default");
+*******************************************************************************
+#create model 
+ public class User
+    {
+        [Key]
+       public Guid Id { get; set; }
+       public string Name { get; set; }
+       public string Email { get; set; }
+       public string Phone { get; set; }    
+       public string Topic { get; set; }
+       public string TimePreference { get; set; }
+       public bool Subscription { get; set; }
+              
+
+    }
+********************************************************************************
+#create controller
+namespace backend_api.Controllers
+{
+
+    [ApiController]
+    [Route("api/users")]
+    public class UserController : Controller
+    {
+        private UsersDbContext userDbContext;
+
+        public UserController(UsersDbContext userDbContext) { 
+            this.userDbContext = userDbContext;
+        }
+
+        //get all users
+        [HttpGet]
+        public async Task<IActionResult> getAllUsers()
+        {
+           var Users =  await userDbContext.Users.ToListAsync();
+            return Ok(Users);
+
+        }
+
+        //get user
+        [HttpGet]
+        [Route("{id:guid}")]
+        [ActionName("getUser")]
+        public async Task<IActionResult> getUser([FromRoute] Guid id)
+        {
+            var User = await userDbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
+            if(User != null)
+            {
+                return Ok(User);
+            }
+            else
+            {
+                return NotFound("User Not Found!");
+            }
+
+        }
+
+        //add user
+        [HttpPost]
+        public async Task<IActionResult> addUser([FromBody] User user)
+        {
+            user.Id=Guid.NewGuid();
+           await userDbContext.Users.AddAsync(user);
+           await userDbContext.SaveChangesAsync();
+            return CreatedAtAction(nameof(getUser), new { id = user.Id }, user);
+        }
+
+
+        //update user
+        [HttpPut]
+        [Route("{id:guid}")]
+        public async Task<IActionResult> updateUser([FromBody] User user, [FromRoute] Guid id)
+        {
+           var existing_user = await userDbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
+            if(existing_user != null)
+            {
+                existing_user.Name = user.Name;
+                existing_user.Email = user.Email;
+                existing_user.Phone = user.Phone;
+                existing_user.Topic = user.Topic;
+                existing_user.TimePreference = user.TimePreference;
+                existing_user.Subscription=user.Subscription;
+              
+               await userDbContext.SaveChangesAsync();
+                return Ok(existing_user);
+
+            }
+            else
+            {
+                return NotFound("User Not Exist!!");
+            }
+
+
+        }
+
+        [HttpDelete]
+        [Route("{id:guid}")]
+     
+        public async Task<IActionResult> deleteUser([FromRoute] Guid id)
+        {
+            var ext_user = await userDbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
+            if (ext_user != null)
+            {
+                userDbContext.Remove(ext_user);
+                await userDbContext.SaveChangesAsync();
+                return Ok(ext_user);
+            }
+            else
+            {
+                return NotFound("User Not Found!");
+            }
+
+        }
+
+
+
+
+    }
+}
+*******************************************************************************
+#app.component.html
+<div class="container-fluid row form-box">
+ <div class="col-6">
+  <h2>Enrollment Form</h2>
+  <div class=" ">
+     <form #userForm="ngForm" (ngSubmit)="submitForm()">
+     <!-- {{userForm.value | json}} -->
+      <br>
+      <!-- {{userForm.form.valid}} -->
+     <!--{{userModel | json}} --> 
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" #name="ngModel" pattern="" [class.is-invalid]= "name.invalid && name.touched" required  class="form-control " name="Name" [(ngModel)]= "user.name">
+        <small class="text-danger" [class.d-none]="name.valid || name.untouched" >*Name is required </small>
+      </div>
+         
+      <div class="form-group ">
+        <label>Email</label>
+        <input type="email" #email="ngModel" pattern="^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$" [class.is-invalid]= "email.invalid && email.touched" required class="form-control" name="Email" [(ngModel)]= "user.email" >
+        <small class="text-danger" [class.d-none]="email.valid || email.untouched">* Please Enter valid Email & Email is required </small>
+      </div>
+
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" #phone="ngModel" pattern="^\d{10}$" [class.is-invalid]= "phone.invalid && phone.touched" required class="form-control" name="Phone" [(ngModel)]= "user.phone" >
+        <small class="text-danger" [class.d-none]="phone.valid || phone.untouched" >*Phone number is required & must be 10 digit </small>
+      </div>
+
+     
+
+      <div class="form-group my-2">
+        <select required #topic="ngModel" [class.is-invalid]= "topic.invalid && topic.touched" class="custom-select" name="Topic" [(ngModel)]= "user.topic">
+          <option value="">I am Interested In</option>
+          <option *ngFor="let topic of topics">{{topic}}</option>
+          
+        </select>
+        <small class="text-danger" [class.d-none]= "topic.valid || topic.untouched">*Please choose a topic</small>
+      </div>
+   
+     <div class="mb-3">
+      <label>Time Preferences</label>
+      <small class="text-danger" [class.d-none]= "time.valid || time.untouched">*Time Preference is required</small>
+      <div class="form-check ">
+        <input #time="ngModel" required class="form-check-input" type="radio" name="TimePreference" value="morning" [(ngModel)]= "user.timePreference">
+        <label>Morning (9AM-12PM)</label>
+    </div>
+
+    <div class="form-check ">
+      <input #time required class="form-check-input " type="radio" name="TimePreference" value="evening" [(ngModel)]= "user.timePreference">
+      <label>Evening (5PM-8PM)</label>
+    </div>
+     </div>
+
+     <div class="form-check-mb3">
+      <input  class="form-check-input" type="checkbox" required name="Subscription" [(ngModel)]= "user.subscription">
+      <label class="form-check-label">Send Me Promotional Offers!</label>
+     </div>
+
+     <div class="row my-2">
+      <div class="col-2">
+        <button [disabled]= "userForm.form.invalid " class="btn btn-success" type="submit">Submit</button>
+      </div>
+      <!-- <div class="col-2">
+        <button class="btn btn-danger" type="submit" (click)="resetForm()">Reset</button>
+      </div> -->
+
+     </div>
+
+     </form>
+
+  </div>
+ </div>
+
+<div class="col-6 list-box">
+   <h2>User List</h2>
+
+   <table class="table">
+    <thead >
+      <tr><th>Name</th>
+        <th >Email</th>
+        <th>Phone</th>
+        <th>Subcription</th>
+        <th>Time </th>
+      <th>Actions</th>
+      </tr>
+    </thead>
+    
+
+     <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{user.name}}</td>
+        <td>{{user.email}}</td>
+        <td>{{user.phone}}</td>
+        <td>{{user.topic}}</td>
+        <td>{{user.timePreference}}</td>
+        <td><button class="btn btn-primary" (click)="populateForm(user)" >Update</button></td>
+        <td><button class="btn btn-danger" (click)="deleteUser(user)">Delete</button></td>
+      </tr>
+     </tbody>
+
+    
+   </table>
+   <div>
+    <mat-paginator showFirstLastButtons [length]="100"
+              [pageSize]="10"
+              [pageSizeOptions]="[5, 10, 25, 100]"
+              aria-label="Select page" >
+</mat-paginator>
+
+   </div>
+
+
+</div>
+
+</div>
+*********************************************************************************
+#model
+export interface User{
+        id:string
+        name:string
+        email :string
+        phone:string
+        topic:string
+        timePreference:string
+        subscription:string
+    }
+******************************************************************************
+#service 
+
+import { Injectable } from '@angular/core';
+import{HttpClient} from '@angular/common/http'
+import { User } from './model/User';
+import { Observable } from 'rxjs';
+@Injectable({
+  providedIn: 'root'
+})
+export class EnrollmentService {
+
+ private URL="https://localhost:7164/api/users";
+  constructor(private _http:HttpClient) { }
+
+  enroll(user:User){
+    return this._http.post<any>(this.URL,user);
+  }
+
+  getAllUsers():Observable<User[]>{
+    return this._http.get<User[]>(this.URL);
+  }
+
+  addUser(user:User):Observable<User>{
+    user.id ="00000000-0000-0000-0000-000000000000";
+    return this._http.post<User>(this.URL,user);
+  }
+
+  updateUser(user:User):Observable<User>{
+    return this._http.put<User>(this.URL+"/"+user.id, user);
+  }
+
+  deleteUser(id:string):Observable<User>{
+    return this._http.delete<User>(this.URL+"/"+id);
+  }
+
+
+}
+
+*******************************************************************************************
+#app.ts
+import { Component, OnInit } from '@angular/core';
+import {FormGroup, FormControl} from '@angular/forms'
+import { User } from './model/User';
+import{EnrollmentService} from './enrollment.service'
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent implements OnInit {
+  title = 'crud-app';
+  topics:string[]= ["Angular", "React", "Vue"]
+  users: User[]=[];
+  user:User = {
+    id:'',
+    name:'',
+    email :'',
+    phone:'',
+    topic:'',
+    timePreference:'',
+    subscription:''
+  }
+
+  
+// submmited:boolean=false;
+  constructor(private _enrollmentService:EnrollmentService){
+
+  }
+  ngOnInit(): void {
+    this.getAllUsers();
+  }
+
+submitForm(){
+
+   if(this.user.id===''){
+    this._enrollmentService.addUser(this.user).subscribe(res => {
+      console.log(res);
+      this.getAllUsers();
+      this.user = {
+        id:'',
+        name:'',
+        email :'',
+        phone:'',
+        topic:'',
+        timePreference:'',
+        subscription:''
+      }
+    })
+   }else{
+    this.updateUser(this.user);
+    this.user = {
+      id:'',
+      name:'',
+      email :'',
+      phone:'',
+      topic:'',
+      timePreference:'',
+      subscription:''
+    }
+   }
+}
+
+updateUser(user:User){
+  this._enrollmentService.updateUser(user).subscribe(res => {
+    console.log(res);
+    this.getAllUsers();
+  })
+}
+getAllUsers(){
+  this._enrollmentService.getAllUsers().subscribe(response => {
+    console.log(response);
+    this.users=response;
+  })
+}
+
+
+deleteUser(user:User){
+ this._enrollmentService.deleteUser(user.id).subscribe(res => {
+  console.log(res);
+  this.getAllUsers();
+ })
+}
+
+populateForm(usr:User){
+  this.user=usr;
+}
+
+resetForm(){
+  this.user = {
+    id:'',
+    name:'',
+    email :'',
+    phone:'',
+    topic:'',
+    timePreference:'',
+    subscription:''
+  }
+}
+
+ 
+}
+
+**************************************************************************
