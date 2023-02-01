@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.InteropServices;
 
 namespace backend_api.Model
@@ -12,6 +13,8 @@ namespace backend_api.Model
        public string Phone { get; set; }    
        public string Topic { get; set; }
        public string TimePreference { get; set; }
+
+        [NotMapped]
        public bool Subscription { get; set; }
               
 
