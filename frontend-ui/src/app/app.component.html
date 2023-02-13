@@ -30,7 +30,7 @@
       <div class="form-group my-2">
         <select required #topic="ngModel" [class.is-invalid]= "topic.invalid && topic.touched" class="custom-select" name="Topic" [(ngModel)]= "user.topic">
           <option value="">I am Interested In</option>
-          <option *ngFor="let topic of topics">{{topic}}</option>
+          <option *ngFor="let topic of topics">{{topic}}</option> 
           
         </select>
         <small class="text-danger" [class.d-none]= "topic.valid || topic.untouched">*Please choose a topic</small>
@@ -59,9 +59,9 @@
       <div class="col-2">
         <button [disabled]= "userForm.form.invalid " class="btn btn-success" type="submit">Submit</button>
       </div>
-      <!-- <div class="col-2">
-        <button class="btn btn-danger" type="submit" (click)="resetForm()">Reset</button>
-      </div> -->
+      <div class="col-2">
+        <button class="btn btn-danger" type="submit" (click)="resetForm(userForm)">Reset</button>
+      </div>
 
      </div>
 
@@ -70,45 +70,10 @@
   </div>
  </div>
 
-<div class="col-6 list-box">
-   <h2>User List</h2>
+  <!-- child component -->
+ <div class="col-6 list-box">
+   <app-user-list [users]="users" (updateUserEvent)="receiveUser($event)"></app-user-list>
+ </div>
 
-   <table class="table">
-    <thead >
-      <tr><th>Name</th>
-        <th >Email</th>
-        <th>Phone</th>
-        <th>Subcription</th>
-        <th>Time </th>
-      <th>Actions</th>
-      </tr>
-    </thead>
-    
-
-     <tbody>
-      <tr *ngFor="let user of users">
-        <td>{{user.name}}</td>
-        <td>{{user.email}}</td>
-        <td>{{user.phone}}</td>
-        <td>{{user.topic}}</td>
-        <td>{{user.timePreference}}</td>
-        <td><button class="btn btn-primary" (click)="populateForm(user)" >Update</button></td>
-        <td><button class="btn btn-danger" (click)="confirmBox(user) ">Delete</button></td>
-      </tr>
-     </tbody>
-
-    
-   </table>
-   <!-- <div>
-    <mat-paginator showFirstLastButtons [length]="100"
-              [pageSize]="10"
-              [pageSizeOptions]="[5, 10, 25, 100]"
-              aria-label="Select page" >
-</mat-paginator>
-
-   </div> -->
-
-
-</div>
 
 </div>

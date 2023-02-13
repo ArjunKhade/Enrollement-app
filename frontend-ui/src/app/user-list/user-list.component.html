@@ -1,0 +1,34 @@
+
+<div class="col-6 list-box">
+    <h2>User List</h2>
+ 
+    <table class="table">
+     <thead >
+       <tr><th>Name</th>
+         <th >Email</th>
+         <th>Phone</th>
+         <th>Topic</th>
+         <th>Time </th>
+       <th>Actions</th>
+       </tr>
+     </thead>
+     
+ 
+      <tbody>
+       <tr *ngFor="let user of users">
+         <td>{{user.name}}</td>
+         <td>{{user.email}}</td>
+         <td>{{user.phone}}</td>
+         <td>{{user.topic}}</td>
+         <td>{{user.timePreference}}</td>
+         <td><button class="btn btn-primary" (click)="populateForm(user) ">Update</button></td>
+         <td><button class="btn btn-danger" (click)="confirmBox(user) ">Delete</button></td>
+       </tr>
+      </tbody>
+ 
+     
+    </table>
+   
+ 
+ 
+ </div>

@@ -1,19 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import {FormGroup, FormControl} from '@angular/forms'
+import {FormGroup, FormControl, NgForm} from '@angular/forms'
 import { User } from './model/User';
 import{EnrollmentService} from './enrollment.service';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { UserClass } from './model/UserClass';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent  {
   title = 'crud-app';
   topics:string[]= ["Angular", "React", "Vue"]
   users: User[]=[];
+  tempUser:UserClass= new UserClass();
   user:User = {
     id:'',
     name:'',
@@ -29,6 +31,7 @@ export class AppComponent implements OnInit {
   constructor(private _enrollmentService:EnrollmentService, private router:Router){
 
   }
+
   ngOnInit(): void {
     this.getAllUsers();
   }
@@ -37,18 +40,31 @@ export class AppComponent implements OnInit {
     Swal.fire('Saved!','Data Saved succesfully!', 'success' );
   }
 
-  navigateToDefault(){
-    this.router.navigateByUrl("");
+
+  receiveUser(user:User){
+   console.log(user)
+   //this.user = user;
+   this.user={...user}
   }
 
-submitForm(){
+  navigateToDefault(){
+    this.router.navigateByUrl("http://localhost:4200/");
+  }
+  getAllUsers(){
+    this._enrollmentService.getAllUsers().subscribe(response => {
+      console.log(response);
+      this.users=response;
+    })
+  }
 
-   if(this.user.id===''){
+ submitForm(){
+
+   if(this.user.id==='' || this.user.id==='00000000-0000-0000-0000-000000000000'){
     this._enrollmentService.addUser(this.user).subscribe(res => {
       console.log(res);
       this.alertForSave();
-      this.navigateToDefault();
-      this.getAllUsers();
+      
+     this.getAllUsers();
       this.user = {
         id:'',
         name:'',
@@ -76,31 +92,20 @@ submitForm(){
 updateUser(user:User){
   this._enrollmentService.updateUser(user).subscribe(res => {
     console.log(res);
+    
     Swal.fire('Updated!','Updated succesfully!', 'success');
     this.navigateToDefault();
     this.getAllUsers();
   })
 }
-getAllUsers(){
-  this._enrollmentService.getAllUsers().subscribe(response => {
-    console.log(response);
-    this.users=response;
-  })
-}
 
 
-deleteUser(user:User){
- this._enrollmentService.deleteUser(user.id).subscribe(res => {
-  console.log(res);
+
+
+resetForm(userForm:NgForm){
+  //userForm.resetForm();
+  userForm.reset();
   this.getAllUsers();
- })
-}
-
-populateForm(usr:User){
-  this.user=usr;
-}
-
-resetForm(){
   this.user = {
     id:'',
     name:'',
@@ -110,32 +115,10 @@ resetForm(){
     timePreference:'',
     subscription:''
   }
+ 
+         
 }
 
-confirmBox(user:User){
-  Swal.fire({
-    title: 'Are you sure want to remove?',
-    text: 'You will not be able to recover this file!',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'No, keep it'
-  }).then((result) => {
-    if (result.value) {
-      this.deleteUser(user);
-      Swal.fire(
-        'Deleted!',
-        'Your file has been deleted.',
-        'success'
-      )
-    } else if (result.dismiss === Swal.DismissReason.cancel) {
-      Swal.fire(
-        'Cancelled',
-        'Your file is safe :)',
-        'error'
-      )
-    }
-  })
-}
+
  
 }
