@@ -1,0 +1,21 @@
+header{
+    height: 120px;
+}
+
+.site-logo{
+    color: var(--primary-color);
+    font-size: 1.5em;
+    text-align: center;
+    justify-content: center;
+}
+
+.div-logo{
+    padding: 5px;
+    background-color: var(--secondary-color);
+    border-radius:12px;
+    height: 40px;
+    
+}
+.text-logo{
+    
+}

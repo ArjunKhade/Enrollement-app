@@ -1,0 +1,63 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 bg-secondary-theme shadow-effect p-5">
+            <h3 class="text-center">New Categories</h3>
+            <p class="text-center mb-5">
+                You can add new Categories from Here...
+            </p>
+            <form  (ngSubmit)="submit(form)" #form="ngForm" action="" class="form-inline text-center">
+                <div class="form-group col-md-10">
+                    <input 
+                     type="text" 
+                     class=" form-control box "
+                     ngModel 
+                     name="category" 
+                     [(ngModel)]="cat.category"
+                     placeholder="Add New Category!"
+                     #newCat='ngModel'
+                     required
+                     [ngClass]="{'is-invalid':newCat.touched && newCat.invalid}"
+                     >
+                     <div class="alert alert-danger" *ngIf="newCat.touched && newCat.invalid">Category field is required!</div>
+                </div>
+                <div class="col-md-2" *ngIf="!flag">
+                    <button [disabled]="form.invalid" class="btn btn-block btn-info mb-2">Add Category</button>
+                </div>
+                <div *ngIf="flag" class="col-md-2" >
+                    <button class="btn btn-block btn-info mb-2" (click)="updateCat(cat.category)">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row mt-5 mb-5">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <div class="card shadow-effect">
+                <div class="card-body">
+                    <table class="table row-border hover">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Category</th>
+                                <th>Action</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let cat of cats; let i=index" >
+                                <td>{{i+1}}</td>
+                                <td>{{cat.category}}</td>
+                                <td><button class="btn btn-warning mx-2 mt-2" (click)="update(cat,i)">Edit</button><button class="btn btn-danger mx-2 mt-2" (click)="delete(cat)">Delete</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+
+
+
+</div>

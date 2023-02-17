@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './layouts/header/header.component';
@@ -16,7 +15,10 @@ import { CommentFormComponent } from './comment-form/comment-form.component';
 import { CommentListComponent } from './comment-list/comment-list.component';
 import { AboutUsComponent } from './pages/about-us/about-us.component';
 import { PostCardComponent } from './layouts/post-card/post-card.component';
+import {AngularFireModule} from '@angular/fire/compat';
 
+
+import  {environment} from '../environments/environment.prod'
 @NgModule({
   declarations: [
     AppComponent,
@@ -36,7 +38,8 @@ import { PostCardComponent } from './layouts/post-card/post-card.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+	  AngularFireModule.initializeApp(environment.firebaseconfig)
   ],
   providers: [],
   bootstrap: [AppComponent]
